@@ -1,0 +1,1123 @@
+---
+title: "Parcial 4 - CPII"
+format: html
+editor: visual
+author: Claire Valeria Calderón Zavaleta y Young Woo Choi
+---
+
+## Parcial 4 - CPII
+
+### Librerías
+
+Para el proyecto que se desdarrollará en este sitio, haremos uso de las siguientes librerías; además, fijamos la semilla con la que estuvimos trabajando durante el desarrollo de este proyecto.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+set.seed(1)
+```
+
+### Ejercicio 1
+
+Considere X~1~, X~2~, \... , X~n~ variables aleatorias independientes e idénticamente distribuidas, todas con distribución exponencial con media 5. También considere Y~1~, Y~2~, \... , Y~m~ variables aleatorias independientes e idénticamente distribuidas todas con distribución exponencial con media 15 e independientes de los X~i~s. Defina la cantidad
+
+$T=\frac{\frac{1}{n}\sum_{i=1}^{n}X_{i}}{\frac{1}{m}\sum_{j=1}^{m}Y_{j}}$
+
+\(a\) Tome m = 20. Simule n = 10, 100, 1,000, 10,000 X~i~s y Y~j~s y sugiera una posible distribución.
+
+```{r}
+#Definimos nuestras lambdas
+lambda1 <- 5
+lambda2 <- 15
+
+simulaciones <- function(n,m){
+  X<-rexp(n, rate = 1/lambda1)
+  Y<-rexp(m, rate = 1/lambda2)
+  PromX <- mean(X)
+  PromY <- mean(Y)
+  resultado <- PromX/PromY
+  return(resultado)
+}
+
+n10 <- replicate(1000, simulaciones(10,20))
+df_simuls_n10 <- data.frame(simulaciones = n10)
+densidadn10 <- df_simuls_n10 %>% ggplot() +
+  geom_density(aes(x = n10), color = "#FF0000", size = 1) +
+  theme_minimal()
+
+n100 <- replicate(1000, simulaciones(100,20))
+df_simuls_n100 <- data.frame(simulaciones = n100)
+densidadn100 <- df_simuls_n100 %>% ggplot() +
+  geom_density(aes(x = n100), color = "#FF0033", size = 1) +
+  theme_minimal()
+
+n1000 <- replicate(1000, simulaciones(1000,20))
+df_simuls_n1000 <- data.frame(simulaciones = n1000)
+densidadn1000 <- df_simuls_n1000 %>% ggplot() +
+  geom_density(aes(x = n1000), color = "#CC0000", size = 1) +
+  theme_minimal()
+
+n10000 <- replicate(1000, simulaciones(1000,20))
+df_simuls_n10000 <- data.frame(simulaciones = n1000)
+densidadn10000 <- df_simuls_n1000 %>% ggplot() +
+  geom_density(aes(x = n1000), color = "#FF6633", size = 1) +
+  theme_minimal()
+
+(densidadn10 | densidadn100) / (densidadn1000 | densidadn10000)
+```
+
+**Respuesta:** De acuerdo con las gráficas observadas, sugerimos que corresponden a una distribución Gamma.
+
+\(b\) Tome n = 20. Simule m = 10, 100, 1,000, 10,000 X~i~s y Y~j~s y sugiera una posible distribución.
+
+```{r}
+m10 <- replicate(1000, simulaciones(20,10))
+df_simuls_m10 <- data.frame(simulaciones = m10)
+densidadm10 <- df_simuls_m10 %>% ggplot() +
+  geom_density(aes(x = m10), color = "#6600FF", size = 1) +
+  theme_minimal()
+
+m100 <- replicate(1000, simulaciones(20,100))
+df_simuls_m100 <- data.frame(simulaciones = m100)
+densidadm100 <- df_simuls_m100 %>% ggplot() +
+  geom_density(aes(x = m100), color = "#9900CC", size = 1) +
+  theme_minimal()
+
+m1000 <- replicate(1000, simulaciones(20,1000))
+df_simuls_m1000 <- data.frame(simulaciones = m1000)
+densidadm1000 <- df_simuls_m1000 %>% ggplot() +
+  geom_density(aes(x = m1000), color = "#663399", size = 1) +
+  theme_minimal()
+
+m10000 <- replicate(1000, simulaciones(20,1000))
+df_simuls_m10000 <- data.frame(simulaciones = m10000)
+densidadm10000 <- df_simuls_m10000 %>% ggplot() +
+  geom_density(aes(x = m10000), color = "#6633CC", size = 1) +
+  theme_minimal()
+
+(densidadm10 | densidadm100) / (densidadm1000 | densidadm10000)
+```
+
+**Respuesta:** De acuerdo con las gráficas observadas, intuimos que se trata de una distribución Gamma.
+
+\(c\) Encuentre la distribución de T
+
+**Respuesta:** Dado que en los incisos a) y b) determinamos que se tratan de Gammas, concluímos que T tiene distribución Gamma.
+
+### Ejercicio 2
+
+Considere X~1~, X~2~, \... , X~n~ variables aleatorias independientes e idénticamente distribuidas, todas con distribución normal estándar. Defina
+
+$U = \frac{\sqrt{n} X_{1}+X_{2}+ . . . + X_{n}}{X_{1}^{2}+X_{2}^{2}+ . . . + X_{n}^{2}}$
+
+Haga n = 10, 100, 1000, 10000 simulaciones de U y sugiera una posible distribución para U
+
+```{r}
+simulacionesU <- function(n){
+  X <- sum(rnorm(n, mean = 0, sd = 1))
+  Y <- sum(rnorm(n, mean = 0, sd = 1)^2)
+  U <- (sqrt(n)*X)/Y
+  return(U)
+}
+U10 <- replicate(1000, simulacionesU(10))
+U100 <- replicate(1000, simulacionesU(100))
+U1000 <- replicate(1000, simulacionesU(1000))
+U10000 <- replicate(1000, simulacionesU(10000))
+
+df_simuls_U10 <- data.frame(simulaciones = U10)
+densidadU10 <- df_simuls_U10 %>% ggplot() +
+  geom_density(aes(x = U10), color = "#00FF00", size = 1) +
+  theme_minimal()
+
+df_simuls_U100 <- data.frame(simulaciones = U100)
+densidadU100 <- df_simuls_U100 %>% ggplot() +
+  geom_density(aes(x = U100), color = "#99FF33", size = 1) +
+  theme_minimal()
+
+df_simuls_U1000 <- data.frame(simulaciones = U1000)
+densidadU1000 <- df_simuls_U10 %>% ggplot() +
+  geom_density(aes(x = U1000), color = "#00FF66", size = 1) +
+  theme_minimal()
+
+df_simuls_U10000 <- data.frame(simulaciones = U10000)
+densidadU10000 <- df_simuls_U10000 %>% ggplot() +
+  geom_density(aes(x = U10000), color = "#00CC33", size = 1) +
+  theme_minimal()
+
+(densidadU10 | densidadU100) / (densidadU1000 | densidadU10000)
+```
+
+**Respuesta:** De acuerdo con las gráficas observadas, sugerimos que U tiene una distribuvión T de Student.
+
+### Ejercicio 3
+
+Considere X~1~, X~2~, \... , X~n~ variables aleatorias independientes e idénticamente distribuidas, todas con distribución Unif(0,5). Defina
+
+\$ U = \\max { (X\_{1}+X\_{2}+ . . . + X\_{n})} - 5\$
+
+Haga n = 10, 100, 1000, 10000 simulaciones de U y sugiera una posible distribución para U
+
+```{r}
+a <- 0
+b <- 5
+esp <- (a + b)/2
+var <- ((b-a)**2)/12
+## n = 10
+n10 <- 10
+simulaciones <- replicate(n, {
+  U <- max(runif(n10, min = a, max = b)) - 5
+  (U - esp) / sqrt(var/n)
+})
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad3_1 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#00CCCC", size = 1) +
+  theme_minimal()
+
+## n = 100
+n10 <- 100
+simulaciones <- replicate(n, {
+  U <- max(runif(n100, min = a, max = b)) - 5
+  (U - esp) / sqrt(var/n)
+})
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad3_2 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#33CC99", size = 1) +
+  theme_minimal()
+
+## n = 1000
+n10 <- 1000
+simulaciones <- replicate(n, {
+  U <- max(runif(n1000, min = a, max = b)) - 5
+  (U - esp) / sqrt(var/n)
+})
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad3_3 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#009999", size = 1) +
+  theme_minimal()
+
+## n = 10000
+n10 <- 10000
+simulaciones <- replicate(n, {
+  U <- max(runif(n10000, min = a, max = b)) - 5
+  (U - esp) / sqrt(var/n)
+})
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad3_4 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#669999", size = 1) +
+  theme_minimal()
+
+(densidad3_1 | densidad3_2) / (densidad3_3 | densidad3_4)
+```
+
+**Respuesta:** De acuerdo con las gráficas observadas, concluímos que U podría tener una distribución Beta.
+
+### Ejercicio 4
+
+Se lanzan 3 dados balanceados. Sea X la suma de las caras.
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga n simulaciones para obtener la función de masa de probabilidad aproximada de X.
+
+```{r}
+caras <- 1:6
+num_dados <- 3
+### n = 100
+n = 100
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica4_1 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#99CCFF") +
+  ggtitle("Densidad de la suma n=100") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 1000
+n = 1000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica4_2 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#33CC99") +
+  ggtitle("Densidad de la suma n=1000") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 10000
+n = 10000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica4_3 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FFCC00") +
+  ggtitle("Densidad de la suma n=100000") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 100000
+n = 100000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica4_4 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FF0033") +
+  ggtitle("Densidad de la suma n=10000") +
+  ylab("f") + xlab("Suma") + theme_light()
+```
+
+\(b\) Usando las funciones de las librería 'patchwork' y 'ggplot2' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inicio anterior.
+
+```{r}
+(grafica4_1 | grafica4_2) / (grafica4_3 | grafica4_4)
+```
+
+**Respuesta:** De acuerdo con lo visto en los gráficos, sugerimos que las simulaciones podrían corresponder a una distribución Poisson.
+
+\(c\) Para n = 10, . . . , 100000 haga n simulaciones para obtener un estimado de la probabilidad IP(X ≤ 3). Ponga en un gráfico n en el eje horizontal y la probabilidad en el eje vertical.
+
+```{r}
+simuls_satisfacen <- vector_simuls <= 3
+str(simuls_satisfacen)
+i <- 10
+vector_simuls[1:i]
+satisfacen <- simuls_satisfacen[1:i]
+satisfacen
+proba_estimada <- sum(satisfacen)/length(satisfacen)
+proba_estimada
+probabilidades_estimadas <- c()
+for(i in 10:length(simuls_satisfacen)){
+  satisfacen <- simuls_satisfacen[1:i]
+  proba_estimada <- sum(satisfacen)/length(satisfacen)
+  probabilidades_estimadas <- c(probabilidades_estimadas, proba_estimada)
+}
+df_probas <- data.frame(n = 10:length(simuls_satisfacen),
+                        probabilidades = probabilidades_estimadas)
+df_probas %>% tail()
+df_probas %>% ggplot() +
+  geom_line(color = '#CC6600',aes(x = n, y = probabilidades)) +
+  theme_light()
+```
+
+### Ejercicio 5
+
+Una urna tiene 7 bolas numeradas del 1 al 7. Se sacan 2 bolas de la urna SIN reemplazo. Sea X la suma del números en las bolas.
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga n simulaciones para obtener la función de masa de probabilidad aproximada de X.
+
+```{r}
+bolas <- 1:7
+num_bolas <- 2
+### n = 100
+n = 100
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = bolas, size = num_bolas, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica5_1 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FF99FF") +
+  ggtitle("Densidad de la suma n=100") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 1000
+n = 1000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica5_2 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FF66FF") +
+  ggtitle("Densidad del producto n=1000") +
+  ylab("f") + xlab("producto") + theme_light()
+### n = 10000
+n = 10000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica5_3 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#CC3399") +
+  ggtitle("Densidad de la suma n=10000") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 100000
+n = 100000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica5_4 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#660066") +
+  ggtitle("Densidad de la suma n=100000") +
+  ylab("f") + xlab("Suma") + theme_light()
+```
+
+\(b\) Usando las funciones de las librería 'patchwork' y 'ggplot2' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inicio anterior.
+
+```{r}
+(grafica5_1 | grafica5_2) / (grafica5_3 | grafica5_4)
+```
+
+**Respuesta:** De acuerdo con las gráficas generadas, X parece tener distribución Binomial.
+
+\(c\) Para n = 10, . . . , 100,000 haga n simulaciones para obtener un estimado de la probabilidad IP(X ≤ 10). Ponga en un gráfico n en el eje horizontal y la probabilidad en el eje vertical.
+
+```{r}
+simuls_satisfacen <- vector_simuls <= 10
+str(simuls_satisfacen)
+i <- 10
+vector_simuls[1:i]
+satisfacen <- simuls_satisfacen[1:i]
+satisfacen
+proba_estimada <- sum(satisfacen)/length(satisfacen)
+proba_estimada
+probabilidades_estimadas <- c()
+for(i in 10:length(simuls_satisfacen)){
+  satisfacen <- simuls_satisfacen[1:i]
+  proba_estimada <- sum(satisfacen)/length(satisfacen)
+  probabilidades_estimadas <- c(probabilidades_estimadas, proba_estimada)
+}
+df_probas <- data.frame(n = 10:length(simuls_satisfacen),
+                        probabilidades = probabilidades_estimadas)
+df_probas %>% tail()
+df_probas %>% ggplot() +
+  geom_line(color = '#FF3366',aes(x = n, y = probabilidades)) +
+  theme_light()
+```
+
+### Ejercicio 6
+
+Una urna tiene 7 bolas numeradas del 1 al 7. Se sacan 2 bolas de la urna CON reemplazo. Sea X la suma del números en las bolas.
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga n simulaciones para obtener la función de masa de probabilidad aproximada de X.
+
+```{r}
+bolas <- 1:7
+num_bolas <- 2
+### n = 100
+n = 100
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = bolas, size = num_bolas, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica6_1 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FFCC66") +
+  ggtitle("Densidad de la suma n=100") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 1000
+n = 1000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica6_2 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FFCC33") +
+  ggtitle("Densidad de la suma n=1000") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 10000
+n = 10000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica6_3 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#FFCC00") +
+  ggtitle("Densidad de la suma n=10000") +
+  ylab("f") + xlab("Suma") + theme_light()
+### n = 100000
+n = 100000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = caras, size = num_dados, replace = TRUE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(suma = vector_simuls)
+head(df)
+grafica6_4 <- df %>% ggplot() +
+  geom_histogram(aes(x = suma,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#CC9900") +
+  ggtitle("Densidad de la suma n=100000") +
+  ylab("f") + xlab("Suma") + theme_light()
+```
+
+\(b\) Usando las funciones de las librerías 'patchwork' y 'ggplot2' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inciso anterior.
+
+```{r}
+(grafica6_1 | grafica6_2) / (grafica6_3 | grafica6_4)
+```
+
+**Respuesta:** Concluímos que, de acuerdo con las gráficas observadas, X tiene distribución Binomial.
+
+\(c\) Para n = 10, . . . , 100000 haga n simulaciones para obtener un estimado de la probabilidad IP(X ≤ 10). Ponga en un gráfico n en el eje horizontal y la probabilidad en el eje vertical.
+
+```{r}
+simuls_satisfacen <- vector_simuls <= 10
+str(simuls_satisfacen)
+i <- 10
+vector_simuls[1:i]
+satisfacen <- simuls_satisfacen[1:i]
+satisfacen
+proba_estimada <- sum(satisfacen)/length(satisfacen)
+proba_estimada
+probabilidades_estimadas <- c()
+for(i in 10:length(simuls_satisfacen)){
+  satisfacen <- simuls_satisfacen[1:i]
+  proba_estimada <- sum(satisfacen)/length(satisfacen)
+  probabilidades_estimadas <- c(probabilidades_estimadas, proba_estimada)
+}
+df_probas <- data.frame(n = 10:length(simuls_satisfacen),
+                        probabilidades = probabilidades_estimadas)
+df_probas %>% tail()
+df_probas %>% ggplot() +
+  geom_line(color = '#CC9933',aes(x = n, y = probabilidades)) +
+  theme_light()
+```
+
+### Ejercicio 7
+
+En un salón de clases del curso de Cálculo de Probabilidad 2 hay 50 estudiantes. Cada estudiante pone en papel su clave única (CU) y lo introduce en una urna común. Posteriormente dichxs estudiantes toman un papel de la urna. Sea X el número de alumnos que sacaron el papelito con su clave única.
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga n simulaciones para obtener la función de masa de probabilidad aproximada de X.
+
+```{r}
+claves <- 1:50
+num_claves <- 1
+### n = 100
+n = 100
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = claves, size = num_claves, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(cuenta = vector_simuls)
+head(df)
+grafica7_1 <- df %>% ggplot() +
+  geom_histogram(aes(x = cuenta,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#66CC00") +
+  ggtitle("Densidad del num de estudiantes n=100") +
+  ylab("f") + xlab("Estudiantes") + theme_light()
+### n = 1000
+n = 1000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = claves, size = num_claves, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(cuenta = vector_simuls)
+head(df)
+grafica7_2 <- df %>% ggplot() +
+  geom_histogram(aes(x = cuenta,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#66CC33") +
+  ggtitle("Densidad del num de estudiantes n=1000") +
+  ylab("f") + xlab("Estudiantes") + theme_light()
+### n = 10000
+n = 10000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = claves, size = num_claves, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(cuenta = vector_simuls)
+head(df)
+grafica7_3 <- df %>% ggplot() +
+  geom_histogram(aes(x = cuenta,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#99CC00") +
+  ggtitle("Densidad del num de estudiantes n=10000") +
+  ylab("f") + xlab("Estudiantes") + theme_light()
+### n = 100000
+n = 100000
+num_sim <- n
+vector_simuls <- c()
+for(i in 1:num_sim){
+  simulacion <- sample(x = claves, size = num_claves, replace = FALSE)
+  valor_simulacion <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_simulacion)
+}
+df <- data.frame(cuenta = vector_simuls)
+head(df)
+grafica7_4 <- df %>% ggplot() +
+  geom_histogram(aes(x = cuenta,
+                     y=..count../sum(..count..)),linewidth=1, fill = "#00CC33") +
+  ggtitle("Densidad del num de estudiantes n=100000") +
+  ylab("f") + xlab("Estudiantes") + theme_light()
+```
+
+\(b\) Usando las funciones de las librer´ıa 'patchwork' y 'ggplot2' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inicio anterior.
+
+```{r}
+(grafica7_1 | grafica7_2) / (grafica7_3 | grafica7_4)
+```
+
+**Respuesta:** Nos resultó difícil determinar una densidad para dicha variable, debido a que la gráfica es irregular. Posiblemente, se trate de una multinomial.
+
+(c) Para n = 10, . . . , 100,000 haga n simulaciones para obtener un estimado de la probabilidad IP(X ≤ 15). Ponga en un gráfico n en el eje horizontal y la probabilidad en el eje vertical.
+
+```{r}
+simuls_satisfacen <- vector_simuls <= 15
+str(simuls_satisfacen)
+i <- 10
+vector_simuls[1:i]
+satisfacen <- simuls_satisfacen[1:i]
+satisfacen
+proba_estimada <- sum(satisfacen)/length(satisfacen)
+proba_estimada
+probabilidades_estimadas <- c()
+for(i in 10:length(simuls_satisfacen)){
+  satisfacen <- simuls_satisfacen[1:i]
+  proba_estimada <- sum(satisfacen)/length(satisfacen)
+  probabilidades_estimadas <- c(probabilidades_estimadas, proba_estimada)
+}
+df_probas <- data.frame(n = 10:length(simuls_satisfacen),
+                        probabilidades = probabilidades_estimadas)
+df_probas %>% tail()
+df_probas %>% ggplot() +
+  geom_line(color = "#006600",aes(x = n, y = probabilidades)) +
+  theme_light()
+```
+
+### Ejercicio 8
+
+Simule tantos números uniformes en el intervalo (0,1) hasta que su suma sea mayor o igual que 1. Sea N el número de sumandos requeridos para alcanzar dicho objetivo. Por ejemplo si obtuvo los números 0.35, 0.58, 0.22 se tiene que N = 3 (pues se necesitó 3 sumandos para que la suma sea mayor ó igual que 1).
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga 10,000 simulaciones para obtener la función de masa de probabilidad aproximada de N.
+
+```{r}
+suma_unif <- function() {
+  suma <- 0
+  n <- 0
+  while (suma < 1) {
+    suma <- suma + runif(1)
+    n <- n + 1
+  }
+  return(n)
+}
+valores <- c(100, 1000, 10000, 100000)
+
+densidad <- lapply(valores, function(n) {
+  N <- replicate(n, suma_unif())
+  den <- frecuencia_relativa(N)
+  return(den)
+})
+
+grafica_den <- function(pmf, n) {
+  df <- data.frame(x = as.numeric(names(pmf)), y = as.vector(pmf))
+  ggplot(df, aes(x = x, y = y)) +
+    geom_bar(stat = "identity", fill = "#666699") +
+    ggtitle(paste("Función de masa de probabilidad para n =", n)) +
+    xlab("X") +
+    ylab("Probabilidad") +
+    theme_minimal()
+}
+grafica8 <- mapply(grafica_den, densidad, valores, SIMPLIFY = FALSE)
+```
+
+\(b\) Usando las funciones de las librer´ıa 'patchwork' y 'ggplot2' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inicio anterior.
+
+```{r}
+(grafica8[[1]] / grafica8[[2]]) | (grafica8[[3]] / grafica8[[4]])
+```
+
+(c) Para n = 10, . . . , 100000 haga n simulaciones para obtener un estimado del valor esperado de 𝔼(X). Ponga en un gráfico n en el eje horizontal y el valor esperado en el eje vertical.
+
+```{r}
+valores_nvo <- 10:10000
+esp_n <- sapply(valores_nvo, function(n) {
+  N <- replicate(n, suma_unif())
+  esp_n <- mean(N)
+  return(esp_n)
+})
+
+grafica_esp <- ggplot(data.frame(n = valores_nvo, valor_esp = esp_n), aes(x = n, y = valor_esp)) +
+  geom_line(color = "#330066") +
+  ggtitle("Valor esperado estimado de E(N)") +
+  xlab("n") +
+  ylab("Valor esperado") +
+  theme_minimal()
+grafica_esp
+```
+
+### Ejercicio 9
+
+Considere X~1~, . . . , X~n~ variables aleatorias independientes e idénticamente distribuidas, X~i~ ∼ Unif(0, 1). Sea X~(2)~ el segundo valor mas de pequeño de estas n X~i~'s
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga n simulaciones para obtener la función de masa de probabilidad aproximada de X~(2)~
+
+```{r}
+a <- 0
+b <- 1
+esp <- (a + b)/2
+var <- ((b-a)**2)/12
+## n = 100
+n <- 100
+simulaciones <- c()
+for(i in 2:n){  
+  simulaciones <- replicate(n, {
+    U <- sort(runif(n, min = a, max = b))[2]
+    (U - esp) / sqrt(var/n)
+  })
+}
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad9_1 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#0000FF", size = 1) +
+  ggtitle("Densidad del X(2), con n=100") +
+  ylab("f") + xlab("Densidad") + theme_light()
+## n = 1000
+n <- 1000
+simulaciones <- c()
+simulaciones <- replicate(n, {
+  U <- sort(runif(n, min = a, max = b))[2]
+  (U - esp) / sqrt(var/n)
+})
+
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad9_2 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#3300FF", size = 1) +
+  ggtitle("Densidad del X(2), con n=1000") +
+  ylab("f") + xlab("Densidad") + theme_light()
+## n = 10000
+n <- 10000
+simulaciones <- c()
+simulaciones <- replicate(n, {
+  U <- sort(runif(n, min = a, max = b))[2]
+  (U - esp) / sqrt(var/n)
+})
+
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad9_3 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#0000CC", size = 1) +
+  ggtitle("Densidad del X(2), con n=10000") +
+  ylab("f") + xlab("Densidad") + theme_light()
+## n = 100000
+n <- 100000
+simulaciones <- c()
+simulaciones <- replicate(n, {
+  U <- sort(runif(n, min = a, max = b))[2]
+  (U - esp) / sqrt(var/n)
+})
+
+df_simuls <- data.frame(simulaciones = simulaciones)
+densidad9_4 <- df_simuls %>% ggplot() +
+  geom_density(aes(x = simulaciones), color = "#330099", size = 1) +
+  ggtitle("Densidad del X(2), con n=100000") +
+  ylab("f") + xlab("Densidad") + theme_light()
+```
+
+\(b\) Usando las funciones de las librería 'patchwork' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inciso (a).
+
+```{r}
+(densidad9_1 | densidad9_2) / (densidad9_3 | densidad9_4)
+```
+
+\(c\) ¿Qué densidad diría que tiene X~(2)~?
+
+**Respuesta:** Por lo que se puede observar en las gráficas, diríamos que la densidad de X~(2)~ corresponde a una distribución Beta.
+
+\(d\) ¿Es consistente este resultado con el ejemplo teórico que se vio en clase?
+
+**Respuesta:** En clase se vio que la j-ésima estadística de orden de n variables aleatorias independientes e idénticamente distribuidas de forma Unif(0,1) se distribuye de manera Beta(j, n-j+1). Por lo tanto, la segunda estadística de orden, según lo que vimos, debería seguir una distribución Beta(2, n-2+1) i.e. Beta(2, n-1). Por lo tanto, sí corresponden ambos resultados.
+
+### Ejercicio 10
+
+Considere X~1~, . . . , X~n~ variables aleatorias independientes e idénticamente distribuidas, X~i~ ∼ Unif(0, 1). Sea X~med~ el segundo valor mas de pequeño de estas n X~i~'s
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga 10000 simulaciones para obtener la función de masa de probabilidad aproximada de X~med~.
+
+```{r}
+## n = 100
+n <- 100 
+N <- 10000
+
+med100 <- replicate(N, median(runif(n, -1, 1)))
+dens100 <- density(med100)
+
+## n = 1000
+n <- 1000 
+N <- 10000
+
+med1000 <- replicate(N, median(runif(n, -1, 1)))
+dens1000 <- density(med1000)
+
+## n = 10000
+n <- 10000
+N <- 10000
+
+med10000 <- replicate(N, median(runif(n, -1, 1)))
+dens10000 <- density(med10000)
+
+## n = 100000
+n <- 100000 
+N <- 10000
+
+med100000 <- replicate(N, median(runif(n, -1, 1)))
+dens100000 <- density(med100000)
+```
+
+\(b\) Usando las funciones de las librería 'patchwork' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inciso (a).
+
+```{r}
+par(mfrow = c(2, 2))
+plot(dens100, main = paste0("n = ", n), xlim = c(-1, 1))
+plot(dens1000, main = paste0("n = ", n), xlim = c(-1, 1))
+plot(dens10000, main = paste0("n = ", n), xlim = c(-1, 1))
+plot(dens100000, main = paste0("n = ", n), xlim = c(-1, 1))
+```
+
+\(c\) ¿Qué densidad diría que tiene X~med~?
+
+**Respuesta:** Por las gráficas, podemos ver que X~med~ tiene una distribución Normal.
+
+### Ejercicio 11
+
+Considere X~1~, . . . , X~999~ variables aleatorias independientes e idénticamente distribuidas, X~i~ ∼ Unif\[-1, 1\]. También considere X~1000~ ∼ Unif\[200,300\], independiente de las otras 999 variables aleatorias, i.e. en total se tienen 1000 variables aleatorias independientes.
+
+\(a\) Para n = 100, 1000, 10000, 100000 haga n\\ simulaciones para obtener la función de masa de probabilidad aproximada de x̅.
+
+```{r}
+var <- 999  # 999 uniformes(-1,1) + 1 unif(200,300)
+var2 <- 1 
+vector_unif <- c()
+vector_simuls <- c()
+xmed_arit <- c()
+## n = 100
+n <- 100
+for(i in 1:n){  
+  vector_unif <- runif(var,min = -1, max = 1)
+  unif2 <- runif(var2,200,300)
+  vector_unif <- c(vector_unif, unif2)
+  suma_variables <- sum(vector_unif)
+  med_arit <- (1/(num_var + num_var2))*suma_variables
+  xmed_arit[i] <- med_arit
+}
+df <- data.frame(media = xmed_arit)
+grafica11_1 <- df %>% ggplot() + 
+  geom_histogram(aes(x = media ,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 size = 1, fill = "#FF9900") + 
+  ggtitle("Densidad con n = 100 simulaciones") +
+  ylab("f(x)") + xlab("N") + theme_light()
+## n = 1000
+n <- 1000
+for(i in 1:n){  
+  vector_unif <- runif(var,min = -1, max = 1)
+  unif2 <- runif(var2,200,300)
+  vector_unif <- c(vector_unif, unif2)
+  suma_variables <- sum(vector_unif)
+  med_arit <- (1/(num_var + num_var2))*suma_variables
+  xmed_arit[i] <- med_arit
+}
+df <- data.frame(media = xmed_arit)
+grafica11_2 <- df %>% ggplot() + 
+  geom_histogram(aes(x = media ,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 size = 1, fill = "#FF9933") + 
+  ggtitle("Densidad con n = 1000 simulaciones") +
+  ylab("f(x)") + xlab("N") + theme_light()
+## n = 10000
+n <- 10000
+for(i in 1:n){  
+  vector_unif <- runif(var,min = -1, max = 1)
+  unif2 <- runif(var2,200,300)
+  vector_unif <- c(vector_unif, unif2)
+  suma_variables <- sum(vector_unif)
+  med_arit <- (1/(num_var + num_var2))*suma_variables
+  xmed_arit[i] <- med_arit
+}
+df <- data.frame(media = xmed_arit)
+grafica11_3 <- df %>% ggplot() + 
+  geom_histogram(aes(x = media ,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 size = 1, fill = "#CC6600") + 
+  ggtitle("Densidad con n = 10000 simulaciones") +
+  ylab("f(x)") + xlab("N") + theme_light()
+## n = 100000
+n <- 100000
+for(i in 1:n){  
+  vector_unif <- runif(var,min = -1, max = 1)
+  unif2 <- runif(var2,200,300)
+  vector_unif <- c(vector_unif, unif2)
+  suma_variables <- sum(vector_unif)
+  med_arit <- (1/(num_var + num_var2))*suma_variables
+  xmed_arit[i] <- med_arit
+}
+df <- data.frame(media = xmed_arit)
+grafica11_4 <- df %>% ggplot() + 
+  geom_histogram(aes(x = media ,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 size = 1, fill = "#CC6633") + 
+  ggtitle("Densidad con n = 100000 simulaciones") +
+  ylab("f(x)") + xlab("N") + theme_light()
+```
+
+(b) Usando las funciones de las librería 'patchwork' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inciso (a).
+
+```{r}
+(grafica11_1 | grafica11_2) / (grafica11_3 | grafica11_4)
+```
+
+\(c\) ¿Qué densidad diría que tiene x̅?
+
+**Respuesta:** Con lo visto en las gráficas, diríamos que tienden a tener una distribución Beta o Normal.
+
+\(d\) ¿Diría que se violenta el Teorema del Límite Central?
+
+**Respuesta:** No, debido a que todas las variables cuentan tanto con medias como con varianzas finitas, por lo que se puede aplicvar el TLC de forma correcta. Además, en todos los casos, tenemos muestras con tamaños mayores a 30.
+
+### Ejercicio 12
+
+Considere X~1~, . . . , X~n~ variables aleatorias independientes e idénticamente distribuidas, X~i~ ∼ exp(1). Sea X~med~ el segundo valor mas de pequeño de estas n X~i~'s
+
+\(a\) Para n = 100, 1,000, 10,000, 100,000 haga 10000 simulaciones para obtener la función de masa de probabilidad aproximada de X~med~.
+
+```{r}
+## n = 100
+n <- 100  
+N <- 10000  
+
+med100 <- replicate(N, median(rexp(n)))
+dens100 <- density(med100)
+
+## n = 1000
+n <- 1000 
+N <- 10000
+
+med1000 <- replicate(N, median(rexp(n)))
+dens1000 <- density(med1000)
+
+## n = 10000
+n <- 10000
+N <- 10000
+
+med10000 <- replicate(N, median(rexp(n)))
+dens10000 <- density(med10000)
+
+## n = 100000
+n <- 100000 
+N <- 10000
+
+med100000 <- replicate(N, median(rexp(n)))
+dens100000 <- density(med100000)
+```
+
+\(b\) Usando las funciones de las librería 'patchwork' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inciso (a).
+
+```{r}
+par(mfrow = c(2, 2))
+plot(dens100, main = paste0("n = ", n), xlim = c(0, 4))
+plot(dens1000, main = paste0("n = ", n), xlim = c(0, 4))
+plot(dens10000, main = paste0("n = ", n), xlim = c(0, 4))
+plot(dens100000, main = paste0("n = ", n), xlim = c(0, 4))
+```
+
+\(c\) ¿Qué densidad diría que tiene X~med~?
+
+**Respuesta:** Osbervando las gráficas, y por el Teorema Central del Límite, sabemos que X~med~ tiene una distribución Exponencial.
+
+### Ejercicio 13
+
+Considere X~1~, . . . , X~n~ variables aleatorias independientes e idénticamente distribuidas, t(1).
+
+\(a\) Calcule teóricamente 𝔼(X)
+
+**Respuesta:** Ya que las variables se distribuyen de forma T de student con 1 grado de libertad, podemos decir que siguen una distribución de Cauchy. De manera teórica sabemos que la distribución de Cauchy tiene tanto como un valor esperado como una varianza indefinida. Esto se puede comprobar con la Ley de los grandes números.
+
+\(b\) Para n = 100, 1,000, 10,000, 100,000 haga 10,000 simulaciones para obtener la función de masa de probabilidad aproximada de x̅, i.e. el promedio aritmético de las observaciones.
+
+```{r}
+n_val <- c(100, 1000, 10000, 100000)
+n_sim <- 10000
+
+prom_t <- function(n) {
+  X <- rt(n, df = 1)
+  prom <- mean(X)
+  return(prom)
+}
+
+prom_nt <- function(n) {
+  sapply(1:n_sim, function(x) prom_t(n))
+}
+
+dens_t <- lapply(n_values, function(n) {
+  simulations <- prom_nt(n)
+  density(simulations)
+})
+grafica_t <- function(pdf, n) {
+  df <- data.frame(x = pdf$x, y = pdf$y)
+  p <- ggplot(df, aes(x = x, y = y)) +
+    geom_line() +
+    labs(title = paste0("n = ", n),
+         x = "¯X",
+         y = "Densidad")
+  return(p)
+}
+
+grafica13 <- mapply(grafica_t, dens_t, n_val, SIMPLIFY = FALSE)
+```
+
+(c) Usando las funciones de la librería 'patchwork' ponga en un mismo gráfico las cuatro gráficas de las funciones de masa del inicio (a).
+
+```{r}
+(grafica13[[1]] | grafica13[[2]]) / (grafica13[[3]] | grafica13[[4]])
+```
+
+\(d\) ¿Qué densidad diría que tiene x̅?
+
+**Respuesta:** Dado que nuestras variables aleatorias cuentan una media indefinida y con una desviación estandar también indefinida, nuestra mejor aproximación es sugerir que x̅ tiene distribución t(1).
+
+\(e\) ¿Diría que se violenta el Teorema del Límite Central?
+
+**Respuesta:** Sí, dado que, como se comentó en el inciso anterior, nuestra muestra no cuenta con medias ni con varianzas definidas, a pesar de que son muestras de tamaños mayores a 30.
+
+### Ejercicio 14
+
+Responda las siguientes preguntas:
+
+\(a\) Considere el lanzamiento de 2 dados y sea X la suma sus valores. Lleve a cabo 100,000 simulaciones y obtenga una aproximación de la función de masa de X.
+
+```{r}
+caras <- 1:6
+dados <- 2
+n <- 100000
+vector_simuls <- c()
+
+for(i in 1:n){
+  simulacion <- sample(x =caras, size = dados, replace= TRUE)
+  valor_sim <- sum(simulacion)
+  vector_simuls <- c(vector_simuls,valor_sim)
+}
+df <- data.frame(suma = vector_simuls)
+
+grafica14_1 <- df %>% ggplot() + 
+  geom_histogram(aes(x = suma,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 linewidth = 1, fill = "#FF6600") + 
+  ggtitle("Densidad de la suma con n = 100,000") +
+  ylab("f(x)") + xlab("Suma") + theme_light()
+grafica14_1
+```
+
+\(b\) Considere dos hexaedros, uno con todas las caras marcadas con "5"; el otro tiene 3 marcas de "2" y el resto de "6". Simule el lanzamiento de estos dos dados y sea Y la suma de sus valores. Lleve a cabo 100,000 simulaciones y obtenga una aproximación de la función de masa de Y.
+
+```{r}
+hex1 <- c(5,5,5,5,5,5)
+hex2 <- c(2,2,2,6,6,6)
+n <- 100000
+vector_simuls <- c()
+
+for(i in 1:n){
+  sim1 <- sample(x = hex1, size = 1)
+  sim2 <- sample(x = hex2, size = 1)
+  valor_sim <- sim1 + sim2
+  vector_simuls <- c(vector_simuls,valor_sim)
+}
+df <- data.frame(suma = vector_simuls)
+
+grafica14_2 <- df %>% ggplot() + 
+  geom_histogram(aes(x = suma,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 linewidth = 1, fill = "#CC0099") + 
+  ggtitle("Densidad de la suma con n = 100,000") +
+  ylab("f(x)") + xlab("Suma") + theme_light()
+grafica14_2
+```
+
+\(c\) Considere el lanzamiento de dos hexaedros, uno marcado con las etiquetas "1", "2", "2", "3", "3", "4" en cada cara; el otro tiene las etiquetas "1", "3", "4", "5", "6" y "8". Sea Z la suma de sus valores. Lleve a cabo 100,000 simulaciones y obtenga una aproximación de la función de masa de Z.
+
+```{r}
+hex3 <- c(1,2,2,3,3,4)
+hex4 <- c(1,3,4,5,6,8)
+n <- 100000
+vector_simuls <- c()
+
+for(i in 1:n){
+  sim3 <- sample(x = hex3, size = 1)
+  sim4 <- sample(x = hex4, size = 1)
+  valor_sim <- sim3 + sim4
+  vector_simuls <- c(vector_simuls,valor_sim)
+}
+df <- data.frame(suma = vector_simuls)
+
+grafica14_3 <- df %>% ggplot() + 
+  geom_histogram(aes(x = suma,
+                     y = after_stat(count)/sum(after_stat(count))),
+                 linewidth = 1, fill = "#009966") + 
+  ggtitle("Densidad de la suma con n = 100,000") +
+  ylab("f(x)") + xlab("Suma") + theme_light()
+grafica14_3
+```
+
+\(d\) ¿Qué puede decir de las densidades de X, Y y Z?
+
+**Respuesta:** De acuerdo con lo que se puede ver en las gráficas, tanto X como Z podrían tener una distribución Binomial, mientras que Y podría tener una distribución Bernoulli.
+
+**Con este último ejercicio, llegamos al fin de este sitio.**
+
+Autores: Claire Valeria Calderón Zavaleta y Young Woo Choi
